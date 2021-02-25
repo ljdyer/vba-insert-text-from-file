@@ -1,0 +1,46 @@
+'Select Microsoft ActiveX Data Objects x.x Library from the list. Verify that at least the following libraries are also selected:
+'
+'Visual Basic for Applications
+'Visual Basic runtime objects and procedures
+'Visual Basic objects and procedures
+'OLE Automation
+
+Dim strFile As String
+ 
+Sub stationery1()
+    writeTxtFileContentToEmail ("C:\Users\User\Documents\my-text.txt")
+End Sub
+ 
+Sub writeTxtFileContentToEmail(fileName As String)
+
+    Dim adoStream As ADODB.Stream
+    Dim objMail As Outlook.MailItem
+    Dim olInspector As Outlook.Inspector
+    Dim olDocument As Word.Document
+    Dim olSelection As Word.Selection
+    Dim linesFromTextFile As Variant
+    
+    Set objMail = Application.ActiveInspector.CurrentItem
+    Set olInspector = Application.ActiveInspector()
+    Set olDocument = olInspector.WordEditor
+    Set olSelection = olDocument.Application.Selection
+    
+    Set adoStream = New ADODB.Stream
+    adoStream.Charset = "UTF-8"
+    adoStream.Open
+    adoStream.LoadFromFile fileName
+  
+    linesFromTextFile = Split(adoStream.ReadText, vbCrLf)
+    
+    For k = LBound(linesFromTextFile) To UBound(linesFromTextFile)
+        textline = linesFromTextFile(k)
+        olSelection.InsertBefore linesFromTextFile(k)
+        olSelection.Collapse Direction:=wdCollapseEnd
+    Next k
+    
+    Set objMail = Nothing
+    Set olSelection = Nothing
+    Set olDocument = Nothing
+    Set olInspector = Nothing
+    
+End Sub
